@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameEnding : MonoBehaviour
 {
@@ -21,12 +22,23 @@ public class GameEnding : MonoBehaviour
     public float displayImageDuration = 1;
     //声明一个CanvasGroup,用来获取UI中的实例，来更改UI图片的透明度
     public CanvasGroup ExitGameImage;
+    public CanvasGroup CaughtGameImage;
+    bool m_IsPlayerCaught;
     void Update()
     {
         if(m_IsPlayerAtExit)
         {
-            EndLevel();
+            EndLevel(ExitGameImage,false);
         }
+        else if(m_IsPlayerCaught)
+        {
+            EndLevel(CaughtGameImage,true);
+        }
+    }
+
+    public void CaughtPlayer()
+    {
+        m_IsPlayerCaught= true;
     }
     //触发器事件
     private void OnTriggerEnter(Collider other)
@@ -37,19 +49,30 @@ public class GameEnding : MonoBehaviour
         }
     }
     //结束关卡
-    void EndLevel()
+    //参数1为UI图片
+    //参数2为是否重新开始
+    void EndLevel(CanvasGroup image,bool doRestart)
     {
         //触发结束时开始计时
         m_Timer += Time.deltaTime;
         //透明度随时间增大而增大，与fadeDuration相等时完全显示
-        ExitGameImage.alpha=m_Timer/fadeDuration;
+        image.alpha=m_Timer/fadeDuration;
         //当完全显示UI后等待displayImageDuration时长后结束游戏
-        if(m_Timer>fadeDuration+displayImageDuration) 
+        if (m_Timer > fadeDuration + displayImageDuration)
         {
-            //退出当前应用程序，打包成发布时才嗯那个生效
-            //Application.Quit();
-            //在Unity编译器中，停止游戏的运行
-            UnityEditor.EditorApplication.isPlaying = false;
+
+            if (doRestart)
+            {
+                //重启该SceneManager
+                SceneManager.LoadScene(0);
+            }
+            else
+            {
+                //退出当前应用程序，打包成发布时才嗯那个生效
+                //Application.Quit();
+                //在Unity编译器中，停止游戏的运行
+                UnityEditor.EditorApplication.isPlaying = false;
+            }
         }
         
     }
