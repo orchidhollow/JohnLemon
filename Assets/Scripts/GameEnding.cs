@@ -24,15 +24,19 @@ public class GameEnding : MonoBehaviour
     public CanvasGroup ExitGameImage;
     public CanvasGroup CaughtGameImage;
     bool m_IsPlayerCaught;
+    //声明声音源对象
+    public AudioSource exitAudio;//胜利
+    public AudioSource caughtAudio;//失败
+    bool m_HasAudioPlayed;
     void Update()
     {
         if(m_IsPlayerAtExit)
         {
-            EndLevel(ExitGameImage,false);
+            EndLevel(ExitGameImage,false,exitAudio);
         }
         else if(m_IsPlayerCaught)
         {
-            EndLevel(CaughtGameImage,true);
+            EndLevel(CaughtGameImage,true,caughtAudio);
         }
     }
 
@@ -51,8 +55,14 @@ public class GameEnding : MonoBehaviour
     //结束关卡
     //参数1为UI图片
     //参数2为是否重新开始
-    void EndLevel(CanvasGroup image,bool doRestart)
+    void EndLevel(CanvasGroup image,bool doRestart,AudioSource audioSource)
     {
+        //如果没有播放过
+        if(!m_HasAudioPlayed)
+        {
+            audioSource.Play();
+            m_HasAudioPlayed= true;
+        }
         //触发结束时开始计时
         m_Timer += Time.deltaTime;
         //透明度随时间增大而增大，与fadeDuration相等时完全显示

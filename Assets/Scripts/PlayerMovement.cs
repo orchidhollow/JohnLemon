@@ -26,12 +26,15 @@ public class PlayerMovement : MonoBehaviour
     Quaternion m_Rotation = Quaternion.identity;
     //旋转速度
     public float turnSpeed = 20;
+    //声明音频
+    AudioSource m_AudioSource;
 
     void Start()
     {
-        //在游戏开始时，获取刚体组件和动画组件
+        //在游戏开始时，获取刚体组件和动画组件和音频组件
         m_Animator = GetComponent<Animator>();
         m_Rigidbody = GetComponent<Rigidbody>();
+        m_AudioSource= GetComponent<AudioSource>();
     }
 
     void Update()
@@ -58,7 +61,18 @@ public class PlayerMovement : MonoBehaviour
         //用三维矢量来表示转向后的角色方向
         Vector3 desiredForward = Vector3.RotateTowards(transform.forward,m_Movement,turnSpeed*Time.deltaTime,0f);//初始向量，目标向量，变化角度
         //设置四元数对象的值
-        m_Rotation=Quaternion.LookRotation(desiredForward);//
+        m_Rotation=Quaternion.LookRotation(desiredForward);
+
+        //如果走动，播放音效
+        if(isWalking)
+        {
+            //保证不是每帧都重复从头播放
+            if(!m_AudioSource.isPlaying)
+            {
+                m_AudioSource.Play();
+            }
+        }
+        else { m_AudioSource.Stop(); }
     }
 
     //当动画播放引发根移动时执行
